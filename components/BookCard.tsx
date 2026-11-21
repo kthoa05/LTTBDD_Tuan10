@@ -10,27 +10,25 @@ export interface BookCardProps {
   onSelect: (id: string) => void;
 }
 
-// TODO BT10.4: xử lý layout "row" và "tile" trong CÙNG component này
-//   - isTile = layout === "tile"
-//   - style của thẻ: [styles.card, isTile && styles.cardTile]; làm tương tự cho coverBox và info
-//   - tile: hiện nhãn rating (styles.ratingBadge) đè lên ảnh, tên sách 1 dòng, ẩn tác giả và thể loại
 function BookCard({ book, layout = "row", onSelect }: BookCardProps) {
+  const isTile = layout === "tile";
   return (
     <TouchableOpacity
       testID={`book-${book.id}`}
       activeOpacity={0.8}
       onPress={() => onSelect(book.id)}
-      style={styles.card}
+      style={[styles.card, isTile && styles.cardTile]}
     >
-      <View style={styles.coverBox}>
+      <View style={[styles.coverBox, isTile && styles.coverBoxTile]}>
         <Image source={{ uri: book.cover }} style={styles.cover} resizeMode="cover" />
+        {isTile && <Text style={styles.ratingBadge}>⭐ {book.rating.toFixed(1)}</Text>}
       </View>
-      <View style={styles.info}>
-        <Text style={styles.title} numberOfLines={2}>{book.title}</Text>
-        <Text style={styles.sub}>{book.author} · {book.category}</Text>
+      <View style={[styles.info, isTile && styles.infoTile]}>
+        <Text style={styles.title} numberOfLines={isTile ? 1 : 2}>{book.title}</Text>
+        {!isTile && <Text style={styles.sub}>{book.author} · {book.category}</Text>}
         <View style={styles.row}>
           <Text style={styles.price}>{formatPrice(book.price)}</Text>
-          <Text style={styles.sub}>⭐ {book.rating.toFixed(1)}</Text>
+          {!isTile && <Text style={styles.sub}>⭐ {book.rating.toFixed(1)}</Text>}
           <Text>{book.inStock ? "✅" : "❌"}</Text>
         </View>
       </View>

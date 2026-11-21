@@ -13,8 +13,7 @@ import { colors } from "../theme";
 export function FavoritesScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const ids = useAppSelector(selectFavoriteIds);
-  // TODO BT10.10c: chỉ giữ các sách có id nằm trong ids (BOOKS.filter(...))
-  const favorites = BOOKS;
+  const favorites = BOOKS.filter((b) => ids.includes(b.id));
   const onSelect = useCallback((id: string) => navigation.navigate("Detail", { id }), [navigation]);
 
   return (

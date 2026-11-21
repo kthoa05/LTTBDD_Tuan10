@@ -2,9 +2,9 @@ import React from "react";
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../navigation";
-import { useAppDispatch } from "../store/hooks";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { addToCart } from "../store/cartSlice";
-// TODO BT10.10b: import useAppSelector (store/hooks), selectIsFavorite và toggleFavorite (store/favoritesSlice)
+import { selectIsFavorite, toggleFavorite } from "../store/favoritesSlice";
 import { getBookById } from "../data/books";
 import { formatPrice } from "../utils";
 import { colors } from "../theme";
@@ -12,8 +12,7 @@ import { colors } from "../theme";
 export function DetailScreen({ route }: NativeStackScreenProps<RootStackParamList, "Detail">) {
   const { id } = route.params; // tham số do màn Home truyền sang
   const dispatch = useAppDispatch();
-  // TODO BT10.10b: const favorite = useAppSelector(selectIsFavorite(id));
-  const favorite = false;
+  const favorite = useAppSelector(selectIsFavorite(id));
   const book = getBookById(id);
 
   if (!book) return <Text style={{ padding: 20 }}>Không tìm thấy sách.</Text>;
@@ -38,9 +37,7 @@ export function DetailScreen({ route }: NativeStackScreenProps<RootStackParamLis
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.btn, styles.btnFav, favorite && styles.btnFavOn]}
-          onPress={() => {
-            // TODO BT10.10b: dispatch(toggleFavorite(book.id))
-          }}
+          onPress={() => dispatch(toggleFavorite(book.id))}
           testID="toggle-fav"
         >
           <Text style={[styles.btnText, !favorite && { color: colors.indigo }]}>{favorite ? "♥ Đã yêu thích" : "♡ Yêu thích"}</Text>

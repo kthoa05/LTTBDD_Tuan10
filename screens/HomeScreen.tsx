@@ -89,17 +89,12 @@ export function HomeScreen({ navigation }: Props) {
           <Text style={styles.empty}>Đang tải sách…</Text>
         </View>
       ) : (
-        // TODO BT10.3d: renderItem dùng <BookCard book={item} layout={isTile ? "tile" : "row"} onSelect={onSelect} />
         // TODO BT10.5a: key={String(numColumns)}, numColumns, columnWrapperStyle={isTile ? styles.columnWrapper : undefined}
         // TODO BT10.5b: refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         <FlatList
           data={visible}
           keyExtractor={(b) => b.id}
-          renderItem={({ item }) => (
-            <Text style={styles.plain}>
-              {item.title} · ⭐ {item.rating} {item.inStock ? "✅" : "❌"}
-            </Text>
-          )}
+          renderItem={({ item }) => <BookCard book={item} layout={isTile ? "tile" : "row"} onSelect={onSelect} />}
           contentContainerStyle={{ padding: 14, paddingBottom: 30 }}
           ListEmptyComponent={<Text style={styles.empty}>Không tìm thấy sách phù hợp.</Text>}
         />

@@ -99,11 +99,7 @@ export function HomeScreen({ navigation }: Props) {
         <FlatList
           data={visible}
           keyExtractor={(b) => b.id}
-          renderItem={({ item }) => (
-            <Text style={styles.plain}>
-              {item.title} · ⭐ {item.rating} {item.inStock ? "✅" : "❌"}
-            </Text>
-          )}
+          renderItem={({ item }) => <BookCard book={item} layout={isTile ? "tile" : "row"} onSelect={onSelect} />}
           contentContainerStyle={{ padding: 14, paddingBottom: 30 }}
           ListEmptyComponent={<Text style={styles.empty}>Không tìm thấy sách phù hợp.</Text>}
         />

@@ -6,6 +6,11 @@ import { colors } from "../theme";
 
 // TODO BT10.3a: khai báo interface BookCardProps gồm
 //   book: Book; layout?: "row" | "tile"; onSelect: (id: string) => void
+export interface BookCardProps {
+  book: Book;
+  layout?: "row" | "tile";
+  onSelect: (id: string) => void;
+}
 
 // TODO BT10.3b: viết component BookCard
 //   - bọc nội dung bằng TouchableOpacity, nhấn thì gọi onSelect(book.id)
@@ -14,12 +19,32 @@ import { colors } from "../theme";
 //   - isTile = layout === "tile"
 //   - style của thẻ: [styles.card, isTile && styles.cardTile]; làm tương tự cho coverBox và info
 //   - tile: hiện nhãn rating (styles.ratingBadge) đè lên ảnh, tên sách 1 dòng, ẩn tác giả và thể loại
-function BookCard(_props: any) {
-  return null;
+function BookCard({ book, layout = "row", onSelect }: BookCardProps) {
+  return (
+    <TouchableOpacity
+      testID={`book-${book.id}`}
+      activeOpacity={0.8}
+      onPress={() => onSelect(book.id)}
+      style={styles.card}
+    >
+      <View style={styles.coverBox}>
+        <Image source={{ uri: book.cover }} style={styles.cover} resizeMode="cover" />
+      </View>
+      <View style={styles.info}>
+        <Text style={styles.title} numberOfLines={2}>{book.title}</Text>
+        <Text style={styles.sub}>{book.author} · {book.category}</Text>
+        <View style={styles.row}>
+          <Text style={styles.price}>{formatPrice(book.price)}</Text>
+          <Text style={styles.sub}>⭐ {book.rating.toFixed(1)}</Text>
+          <Text>{book.inStock ? "✅" : "❌"}</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
 }
 
 // TODO BT10.3c: đổi thành export default React.memo(BookCard)
-export default BookCard;
+export default React.memo(BookCard);
 
 const styles = StyleSheet.create({
   card: { flexDirection: "row", backgroundColor: "#fff", borderRadius: 14, padding: 10, marginBottom: 10, borderWidth: 1, borderColor: colors.line, gap: 12 },

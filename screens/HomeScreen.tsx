@@ -25,6 +25,7 @@ export function HomeScreen({ navigation }: Props) {
   const [keyword, setKeyword] = useState("");
   const [category, setCategory] = useState<string | null>(null);
   const [isTile, setIsTile] = useState(false); // Switch "Dạng lưới"
+  const [inStockOnly, setInStockOnly] = useState(false); // Switch "Chỉ còn hàng"
   const [useArray, setUseArray] = useState(!USE_API);
 
   const loadFromArray = useCallback(() => {
@@ -63,9 +64,10 @@ export function HomeScreen({ navigation }: Props) {
     return sourceBooks.filter(
       (b) =>
         (category === null || b.category === category) &&
+        (!inStockOnly || b.inStock) &&
         (k === "" || normalize(b.title).includes(k) || normalize(b.author).includes(k))
     );
-  }, [sourceBooks, keyword, category]);
+  }, [sourceBooks, keyword, category, inStockOnly]);
 
   const onSelect = useCallback((id: string) => {
     navigation.navigate("Detail", { id });
@@ -85,6 +87,8 @@ export function HomeScreen({ navigation }: Props) {
           onChangeText={setKeyword}
         />
         <View style={styles.switchRow}>
+          <Text style={styles.switchLabel}>Chỉ còn hàng</Text>
+          <Switch value={inStockOnly} onValueChange={setInStockOnly} testID="instock-switch" />
           <Text style={styles.switchLabel}>Dạng lưới</Text>
           <Switch value={isTile} onValueChange={setIsTile} testID="grid-switch" />
         </View>

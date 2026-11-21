@@ -10,16 +10,22 @@ import { normalize } from "../utils";
 import type { Book } from "../types";
 import BookCard from "../components/BookCard";
 import { colors } from "../theme";
+import { USE_API } from "../config";
+import { fetchBooks, selectBooksState } from "../store/booksSlice";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 
 type Props = CompositeScreenProps<BottomTabScreenProps<TabParamList, "Home">, NativeStackScreenProps<RootStackParamList>>;
 
 export function HomeScreen({ navigation }: Props) {
+  const dispatch = useAppDispatch();
+  const api = useAppSelector(selectBooksState); // Bài 10.11: dữ liệu từ API nằm trong store
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [keyword, setKeyword] = useState("");
   const [category, setCategory] = useState<string | null>(null);
   const [isTile, setIsTile] = useState(false); // Switch "Dạng lưới"
+  const [useArray, setUseArray] = useState(!USE_API); // true: đọc mảng; false: đọc từ store (API)
 
   // TODO BT10.11c (Bonus, không bắt buộc): đọc từ API khi USE_API = true
   //   - import { USE_API } từ "../config"; import { fetchBooks, selectBooksState } từ "../store/booksSlice"
@@ -28,33 +34,51 @@ export function HomeScreen({ navigation }: Props) {
   //   - status "loading" hiện ActivityIndicator; status "failed" hiện thông báo lỗi, nút "Thử lại" (dispatch lại)
   //     và nút "Dùng dữ liệu mảng" (quay về đọc mảng); kéo để làm mới cũng dispatch(fetchBooks())
   // Lần đầu: tải mảng (có độ trễ giả lập) rồi tắt trạng thái loading
-  useEffect(() => {
+  const loadFromArray = useCallback(() => {
+    setLoading(true);
     loadBooks().then((data) => {
       setBooks(data);
       setLoading(false);
     });
   }, []);
 
+  // USE_API bật thì gọi thunk, ngược lại đọc mảng
+  useEffect(() => {
+    if (USE_API) dispatch(fetchBooks());
+    else loadFromArray();
+  }, [dispatch, loadFromArray]);
+
   // TODO BT10.5b: kéo để làm mới
   //   setRefreshing(true) -> setBooks(await loadBooks()) -> setRefreshing(false)
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    setBooks(await loadBooks());
+    if (useArray) setBooks(await loadBooks());
+    else await dispatch(fetchBooks());
     setRefreshing(false);
-  }, []);
+  }, [dispatch, useArray]);
 
-  const categories = useMemo(() => Array.from(new Set(books.map((b) => b.category))), [books]);
+  // Bonus: API lỗi thì cho phép quay về dữ liệu mảng
+  const switchToArray = useCallback(() => {
+    setUseArray(true);
+    loadFromArray();
+  }, [loadFromArray]);
+
+  const sourceBooks = useArray ? books : api.items;
+  const isLoading = useArray ? loading : api.status === "idle" || (api.status === "loading" && api.items.length === 0);
+  const apiFailed = !useArray && api.status === "failed";
+
+  const categories = useMemo(() => Array.from(new Set(sourceBooks.map((b) => b.category))), [sourceBooks]);
 
   // TODO BT10.6: lọc theo category (null là tất cả) và theo keyword (so khớp tên hoặc tác giả,
   //   dùng normalize() để bỏ dấu); bọc trong useMemo với [books, keyword, category]
   const visible = useMemo(() => {
     const k = normalize(keyword);
-    return books.filter(
+    return sourceBooks.filter(
       (b) =>
         (category === null || b.category === category) &&
         (k === "" || normalize(b.title).includes(k) || normalize(b.author).includes(k))
     );
-  }, [books, keyword, category]);
+  }, [sourceBooks, keyword, category]);
 
   const onSelect = useCallback((id: string) => {
     // TODO BT10.7d: navigation.navigate("Detail", { id })
@@ -96,7 +120,20 @@ export function HomeScreen({ navigation }: Props) {
         ))}
       </View>
 
-      {loading ? (
+      {apiFailed && sourceBooks.length === 0 ? (
+        <View style={styles.center} testID="api-error">
+          <Text style={styles.errorTitle}>Không tải được danh sách sách</Text>
+          <Text style={styles.errorText}>{api.error}</Text>
+          <View style={styles.errorActions}>
+            <TouchableOpacity style={styles.errBtn} onPress={() => dispatch(fetchBooks())} testID="retry">
+              <Text style={styles.errBtnText}>Thử lại</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.errBtn, styles.errBtnAlt]} onPress={switchToArray} testID="use-array">
+              <Text style={[styles.errBtnText, { color: colors.indigo }]}>Dùng dữ liệu mảng</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ) : isLoading ? (
         // TODO BT10.2b: hiển thị <ActivityIndicator size="large" color={colors.indigo} /> kèm chữ "Đang tải sách…"
         <View style={styles.center}>
           <ActivityIndicator size="large" color={colors.indigo} />
@@ -116,6 +153,7 @@ export function HomeScreen({ navigation }: Props) {
           renderItem={({ item }) => <BookCard book={item} layout={isTile ? "tile" : "row"} onSelect={onSelect} />}
           contentContainerStyle={{ padding: 14, paddingBottom: 30 }}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          ListHeaderComponent={apiFailed ? <Text style={styles.banner} testID="api-banner">Không làm mới được: {api.error}</Text> : null}
           ListEmptyComponent={<Text style={styles.empty}>Không tìm thấy sách phù hợp.</Text>}
         />
       )}

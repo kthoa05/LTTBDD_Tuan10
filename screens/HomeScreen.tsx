@@ -87,17 +87,26 @@ export function HomeScreen({ navigation }: Props) {
 
       {loading ? (
         // TODO BT10.2b: hiển thị <ActivityIndicator size="large" color={colors.indigo} /> kèm chữ "Đang tải sách…"
-        <Text style={styles.empty}>Đang tải…</Text>
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color={colors.indigo} />
+          <Text style={styles.empty}>Đang tải sách…</Text>
+        </View>
       ) : (
         // TODO BT10.2a: thay khối bên dưới bằng FlatList (data={visible}, keyExtractor) hiển thị tên, rating, ✅/❌
         // TODO BT10.3d: renderItem dùng <BookCard book={item} layout={isTile ? "tile" : "row"} onSelect={onSelect} />
         // TODO BT10.5a: key={String(numColumns)}, numColumns, columnWrapperStyle={isTile ? styles.columnWrapper : undefined}
         // TODO BT10.5b: refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-        <View style={{ padding: 14 }}>
-          {visible.map((b) => (
-            <Text key={b.id} style={styles.plain}>{b.title}</Text>
-          ))}
-        </View>
+        <FlatList
+          data={visible}
+          keyExtractor={(b) => b.id}
+          renderItem={({ item }) => (
+            <Text style={styles.plain}>
+              {item.title} · ⭐ {item.rating} {item.inStock ? "✅" : "❌"}
+            </Text>
+          )}
+          contentContainerStyle={{ padding: 14, paddingBottom: 30 }}
+          ListEmptyComponent={<Text style={styles.empty}>Không tìm thấy sách phù hợp.</Text>}
+        />
       )}
     </SafeAreaView>
   );

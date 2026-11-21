@@ -56,7 +56,7 @@ export function HomeScreen({ navigation }: Props) {
   return (
     // TODO BT10.1b: thay View bên dưới bằng SafeAreaView (edges={["top"]}) từ react-native-safe-area-context,
     //   đổi cả thẻ đóng </View> tương ứng ở cuối return thành </SafeAreaView>
-    <View style={styles.root}>
+    <SafeAreaView style={styles.root} edges={["top"]}>
       <View style={styles.header}>
         <Text style={styles.title}>📚 BookStore</Text>
         <TextInput
@@ -99,7 +99,7 @@ export function HomeScreen({ navigation }: Props) {
           ))}
         </View>
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 

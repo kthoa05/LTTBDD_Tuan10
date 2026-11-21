@@ -1,8 +1,10 @@
 import React from "react";
-import { HomeScreen } from "./screens/HomeScreen"; // BT10.7c: bỏ import này khi đã dùng RootNavigator
+// import { HomeScreen } from "./screens/HomeScreen"; // BT10.7c: bỏ import này khi đã dùng RootNavigator
 // TODO BT10.1a: import SafeAreaProvider từ "react-native-safe-area-context"
 import { SafeAreaProvider } from "react-native-safe-area-context";
 // TODO BT10.7c: import NavigationContainer từ "@react-navigation/native" và RootNavigator từ "./navigation"
+import { NavigationContainer } from "@react-navigation/native";
+import { RootNavigator } from "./navigation";
 // TODO BT10.8c: import Provider từ "react-redux" và store từ "./store"
 
 export default function App() {
@@ -12,7 +14,9 @@ export default function App() {
   // TODO BT10.8c: bọc thêm <Provider store={store}> ở ngoài cùng
   return (
     <SafeAreaProvider>
-      <HomeScreen {...({} as any)} />
+      <NavigationContainer>
+        <RootNavigator />
+      </NavigationContainer>
     </SafeAreaProvider>
   );
 }

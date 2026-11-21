@@ -58,8 +58,8 @@ export function HomeScreen({ navigation }: Props) {
 
   const onSelect = useCallback((id: string) => {
     // TODO BT10.7d: navigation.navigate("Detail", { id })
-    console.log("Chọn sách", id);
-  }, []);
+    navigation.navigate("Detail", { id });
+  }, [navigation]);
 
   // TODO BT10.5a: numColumns = isTile ? 2 : 1
   const numColumns = isTile ? 2 : 1;

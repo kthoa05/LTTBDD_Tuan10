@@ -47,7 +47,14 @@ export function HomeScreen({ navigation }: Props) {
 
   // TODO BT10.6: lọc theo category (null là tất cả) và theo keyword (so khớp tên hoặc tác giả,
   //   dùng normalize() để bỏ dấu); bọc trong useMemo với [books, keyword, category]
-  const visible = books;
+  const visible = useMemo(() => {
+    const k = normalize(keyword);
+    return books.filter(
+      (b) =>
+        (category === null || b.category === category) &&
+        (k === "" || normalize(b.title).includes(k) || normalize(b.author).includes(k))
+    );
+  }, [books, keyword, category]);
 
   const onSelect = useCallback((id: string) => {
     // TODO BT10.7d: navigation.navigate("Detail", { id })

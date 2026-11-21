@@ -37,7 +37,11 @@ export function HomeScreen({ navigation }: Props) {
 
   // TODO BT10.5b: kéo để làm mới
   //   setRefreshing(true) -> setBooks(await loadBooks()) -> setRefreshing(false)
-  const onRefresh = useCallback(async () => {}, []);
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    setBooks(await loadBooks());
+    setRefreshing(false);
+  }, []);
 
   const categories = useMemo(() => Array.from(new Set(books.map((b) => b.category))), [books]);
 
@@ -51,7 +55,7 @@ export function HomeScreen({ navigation }: Props) {
   }, []);
 
   // TODO BT10.5a: numColumns = isTile ? 2 : 1
-  const numColumns = 1;
+  const numColumns = isTile ? 2 : 1;
 
   return (
     // TODO BT10.1b: thay View bên dưới bằng SafeAreaView (edges={["top"]}) từ react-native-safe-area-context,
@@ -97,10 +101,14 @@ export function HomeScreen({ navigation }: Props) {
         // TODO BT10.5a: key={String(numColumns)}, numColumns, columnWrapperStyle={isTile ? styles.columnWrapper : undefined}
         // TODO BT10.5b: refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         <FlatList
+          key={String(numColumns)}
           data={visible}
           keyExtractor={(b) => b.id}
+          numColumns={numColumns}
+          columnWrapperStyle={isTile ? styles.columnWrapper : undefined}
           renderItem={({ item }) => <BookCard book={item} layout={isTile ? "tile" : "row"} onSelect={onSelect} />}
           contentContainerStyle={{ padding: 14, paddingBottom: 30 }}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           ListEmptyComponent={<Text style={styles.empty}>Không tìm thấy sách phù hợp.</Text>}
         />
       )}

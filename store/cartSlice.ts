@@ -13,7 +13,10 @@ const cartSlice = createSlice({
       else state.items.push({ bookId: id, title, price, quantity: 1 });
     },
     decrease(state, action: PayloadAction<string>) {
-      // TODO BT10.9a: giảm quantity đi 1; nếu quantity đang là 1 thì xoá sách khỏi giỏ
+      const found = state.items.find((i) => i.bookId === action.payload);
+      if (!found) return;
+      if (found.quantity > 1) found.quantity -= 1;
+      else state.items = state.items.filter((i) => i.bookId !== action.payload);
     },
     removeFromCart(state, action: PayloadAction<string>) {
       state.items = state.items.filter((i) => i.bookId !== action.payload);

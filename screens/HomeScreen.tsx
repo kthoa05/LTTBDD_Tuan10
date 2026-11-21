@@ -26,6 +26,7 @@ export function HomeScreen({ navigation }: Props) {
   const [category, setCategory] = useState<string | null>(null);
   const [isTile, setIsTile] = useState(false); // Switch "Dạng lưới"
   const [inStockOnly, setInStockOnly] = useState(false); // Switch "Chỉ còn hàng"
+  const [sortByPrice, setSortByPrice] = useState(false); // chip "Giá tăng dần"
   const [useArray, setUseArray] = useState(!USE_API);
 
   const loadFromArray = useCallback(() => {
@@ -61,13 +62,14 @@ export function HomeScreen({ navigation }: Props) {
 
   const visible = useMemo(() => {
     const k = normalize(keyword);
-    return sourceBooks.filter(
+    const list = sourceBooks.filter(
       (b) =>
         (category === null || b.category === category) &&
         (!inStockOnly || b.inStock) &&
         (k === "" || normalize(b.title).includes(k) || normalize(b.author).includes(k))
     );
-  }, [sourceBooks, keyword, category, inStockOnly]);
+    return sortByPrice ? [...list].sort((a, b) => a.price - b.price) : list;
+  }, [sourceBooks, keyword, category, inStockOnly, sortByPrice]);
 
   const onSelect = useCallback((id: string) => {
     navigation.navigate("Detail", { id });
@@ -105,6 +107,13 @@ export function HomeScreen({ navigation }: Props) {
             <Text style={[styles.chipText, category === c && styles.chipTextOn]}>{c ?? "Tất cả"}</Text>
           </TouchableOpacity>
         ))}
+        <TouchableOpacity
+          style={[styles.chip, sortByPrice && styles.chipOn]}
+          onPress={() => setSortByPrice((v) => !v)}
+          testID="chip-sort-price"
+        >
+          <Text style={[styles.chipText, sortByPrice && styles.chipTextOn]}>Giá tăng dần</Text>
+        </TouchableOpacity>
       </View>
 
       {apiFailed && sourceBooks.length === 0 ? (

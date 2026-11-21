@@ -2,9 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { Book } from "../types";
 import { API_URL } from "../config";
 import type { RootState } from "./index";
-
 type Status = "idle" | "loading" | "succeeded" | "failed";
-
 export const fetchBooks = createAsyncThunk<Book[], void, { rejectValue: string }>(
   "books/fetchBooks",
   async (_, { rejectWithValue }) => {
@@ -17,7 +15,6 @@ export const fetchBooks = createAsyncThunk<Book[], void, { rejectValue: string }
     }
   }
 );
-
 const booksSlice = createSlice({
   name: "books",
   initialState: { items: [] as Book[], status: "idle" as Status, error: null as string | null },
@@ -38,7 +35,5 @@ const booksSlice = createSlice({
       });
   },
 });
-
 export default booksSlice.reducer;
-
 export const selectBooksState = (s: RootState) => s.books;

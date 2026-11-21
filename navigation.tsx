@@ -23,10 +23,11 @@ function Tabs() {
   // TODO BT10.7b: dùng Tab.Navigator (headerShown: false) gồm 3 tab:
   //   Home (title "Sách"), Cart (title "Giỏ hàng"), Favorites (title "Yêu thích")
   // TODO BT10.9c: tab Cart có tabBarBadge = số lượng trong giỏ (useAppSelector(selectCartCount)), ẩn khi bằng 0
+  const count = useAppSelector(selectCartCount);
   return (
     <Tab.Navigator screenOptions={{ headerShown: false, tabBarActiveTintColor: colors.indigo }}>
       <Tab.Screen name="Home" component={HomeScreen} options={{ title: "Sách", tabBarIcon: () => <Text>📚</Text> }} />
-      <Tab.Screen name="Cart" component={CartScreen} options={{ title: "Giỏ hàng", tabBarIcon: () => <Text>🛒</Text> }} />
+      <Tab.Screen name="Cart" component={CartScreen} options={{ title: "Giỏ hàng", tabBarIcon: () => <Text>🛒</Text>, tabBarBadge: count > 0 ? count : undefined }} />
       <Tab.Screen name="Favorites" component={FavoritesScreen} options={{ title: "Yêu thích", tabBarIcon: () => <Text>♥</Text> }} />
     </Tab.Navigator>
   );

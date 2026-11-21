@@ -3,6 +3,8 @@ import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "rea
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../navigation";
 // TODO BT10.9b: import useAppDispatch (store/hooks) và addToCart (store/cartSlice)
+import { useAppDispatch } from "../store/hooks";
+import { addToCart } from "../store/cartSlice";
 // TODO BT10.10b: import useAppSelector (store/hooks), selectIsFavorite và toggleFavorite (store/favoritesSlice)
 import { getBookById } from "../data/books";
 import { formatPrice } from "../utils";
@@ -11,6 +13,7 @@ import { colors } from "../theme";
 export function DetailScreen({ route }: NativeStackScreenProps<RootStackParamList, "Detail">) {
   const { id } = route.params; // tham số do màn Home truyền sang
   // TODO BT10.9b: const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
   // TODO BT10.10b: const favorite = useAppSelector(selectIsFavorite(id));
   const favorite = false;
   const book = getBookById(id);
@@ -32,6 +35,7 @@ export function DetailScreen({ route }: NativeStackScreenProps<RootStackParamLis
           disabled={!book.inStock}
           onPress={() => {
             // TODO BT10.9b: dispatch(addToCart(book))
+            dispatch(addToCart(book));
           }}
           testID="add-cart"
         >
